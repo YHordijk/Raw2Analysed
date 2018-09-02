@@ -23,6 +23,26 @@ from openpyxl.drawing.text import Paragraph, ParagraphProperties, CharacterPrope
 #Fitted values for hexadecane
 defaultFitValues=["lnA-lnB*expT1*log((flowRate-expY0)/expA1)", 0.25326, 6.0239, 40.00738, -39.93092, 14.97745]
 
+#Defining of variables
+totalVol=0.0
+rootPadY=2
+rootPadX=2
+currFile=0
+newFileName=''
+headers=['Index', 'Time (s)', 'Bubsize', 'Delta Time (s)', 'Flow rate(bubbles/s)', 'Volume per bubble (uL)', 'Total volume (uL)']
+headers2=['File index', 'Number of bubbles', 'Average bubsize', 'Standard deviation', 'Relative 95% CI', 'Total time (s)', 'Total volume (mL)', 'File']
+columnWidths=[8, 9, 9, 14, 20, 22, 17]
+columnsPerFile=len(headers)+1
+files=[]
+cutOffValues=[]
+topRowOffset=15
+leftColumnOffset=1
+skipLines=5
+
+lowerBubSizeBound=20
+upperBubSizeBound=500
+
+root=tk.Tk()
 def SetDefaultFitValues():
     global formula
     formula=defaultFitValues[0]
@@ -36,31 +56,24 @@ def SetDefaultFitValues():
     expA1=defaultFitValues[4]
     global expT1
     expT1=defaultFitValues[5]
-    #Destroy valueDialog
-    valueDialog.destroy()
 
-#Defining of variables
-totalVol=0.0
-rootPadY=2
-rootPadX=2
-currFile=0
-newFileName=''
-headers=['Index', 'Time (s)', 'Bubsize', 'Delta Time (s)', 'Flow rate(bubbles/s)', 'Volume per bubble (uL)', 'Total volume (uL)']
-headers2=['File index', 'Number of bubbles', 'Average bubsize', 'Standard deviation', 'Relative 95% CI', 'Total time (s)', 'Total volume (mL)', 'File']
-columnWidths=[8, 9, 9, 14, 20, 22, 17]
-columnsPerFile=len(headers)+1
-SetDefaultFitValues()
-files=[]
-cutOffValues=[]
-topRowOffset=15
-leftColumnOffset=1
-skipLines=5
-
-lowerBubSizeBound=20
-upperBubSizeBound=500
-
-root=tk.Tk()
-
+    try:
+        entry_formula.delete(0, 'end')
+        entry_slope.delete(0, 'end')
+        entry_intercept.delete(0, 'end')
+        entry_y0.delete(0, 'end')
+        entry_A1.delete(0, 'end')
+        entry_t1.delete(0, 'end')
+        
+        entry_formula.insert(0, formula)
+        entry_slope.insert(0, lnB)
+        entry_intercept.insert(0, lnA)
+        entry_y0.insert(0, expY0)
+        entry_A1.insert(0, expA1)
+        entry_t1.insert(0, expT1)
+    except:
+        pass
+    
 def SetFitValues():
     global formula
     formula=entry_formula.get()
@@ -74,7 +87,8 @@ def SetFitValues():
     expA1=float(entry_A1.get())
     global expT1
     expT1=float(entry_t1.get())
-    #Destroy valueDialog
+
+def CloseDialog():
     valueDialog.destroy()
 
 def CreateSetFitValuesGUI():
@@ -120,6 +134,7 @@ def CreateSetFitValuesGUI():
     #Button to close GUI and set the values
     tk.Button(valueDialog, text='Set parameters', command=SetFitValues).grid(row=6, column=0)
     tk.Button(valueDialog, text='Reset to default', command=SetDefaultFitValues).grid(row=6, column=1)
+    tk.Button(valueDialog, text='Close', command=CloseDialog).grid(row=6, column=2)
     valueDialog.mainloop()
 
 def GetFiles():
@@ -395,5 +410,6 @@ def CreateGUI():
     tk.Button(frame, text='Set fitted Parameters', command=CreateSetFitValuesGUI).grid(row=1, column=2, pady=rootPadY, padx=rootPadX)
     tk.Button(frame, text='Show file list', command=ShowFileList).grid(row=1, column=3, pady=rootPadY, padx=rootPadX)
 
+SetDefaultFitValues()
 CreateGUI()
 root.mainloop()
